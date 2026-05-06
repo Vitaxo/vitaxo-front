@@ -48,6 +48,12 @@ Application web de gestion pour une mutuelle santé. Espace administrateur et es
 
 Ce projet suit la **Feature-Sliced Design (FSD)** — une architecture modulaire organisée par couches et tranches (slices), pensée pour la scalabilité et la maintenabilité.
 
+> Documentation officielle : [feature-sliced.design](https://feature-sliced.design/)
+### Vue d'ensemble
+
+![Concept](/docs/images/concept-fsd.jpg)
+![FSD Overview](/docs/images/fsd-folders-and-slices.png)
+
 ### Principe fondamental
 
 Le code est découpé en **couches** (layers), chaque couche en **tranches** (slices), chaque tranche en **segments** (ui, model, api, lib).
