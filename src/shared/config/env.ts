@@ -1,7 +1,7 @@
 const readEnv = (value: string | undefined, fallback: string) => value?.trim() || fallback
 
 export const env = {
-  VITE_API_URL: readEnv(import.meta.env.VITE_API_URL as string | undefined, 'http://localhost:3000/api'),
+  VITE_API_URL: readEnv(import.meta.env.VITE_API_URL as string | undefined, 'http://localhost:8080'),
   VITE_KEYCLOAK_URL: readEnv(
     import.meta.env.VITE_KEYCLOAK_URL as string | undefined,
     'http://localhost:8081',

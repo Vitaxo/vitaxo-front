@@ -27,7 +27,7 @@ export const RegisterForm = () => {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">
-          Le realm exporté ne contient que le client `mutuelle-backend`.
+          Votre compte sera créé et sécurisé par le service d'identité Mutuelle.
         </p>
         {error && <p className="text-destructive text-sm">{error}</p>}
         <Button className="w-full" disabled={isPending} onClick={handleRegister}>

@@ -1,11 +1,37 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchUserProfile, useUserStore } from '@/entities/user'
+import type { User } from '@/entities/user'
 import { queryKeys } from '@/shared/api/query-keys'
 import { setAccessToken } from '@/shared/lib/access-token'
 import { getKeycloakClient } from './auth-client'
 
+const getDashboardRedirectUri = () => `${window.location.origin}/dashboard`
 const getAppRedirectUri = () => `${window.location.origin}/`
+
+const buildFallbackUser = (): User => {
+  const keycloak = getKeycloakClient()
+  const tokenClaims = keycloak.tokenParsed as
+    | {
+        email?: string
+        family_name?: string
+        given_name?: string
+        name?: string
+        sub?: string
+      }
+    | undefined
+
+  const identifier = tokenClaims?.sub ?? 'keycloak-user'
+  const email = tokenClaims?.email ?? identifier
+
+  return {
+    email,
+    firstName: tokenClaims?.given_name ?? null,
+    fullName: tokenClaims?.name ?? null,
+    id: identifier,
+    lastName: tokenClaims?.family_name ?? null,
+  }
+}
 
 const syncAccessToken = async () => {
   const keycloak = getKeycloakClient()
@@ -22,11 +48,11 @@ const syncAccessToken = async () => {
 }
 
 export const loginWithKeycloak = async () => {
-  await getKeycloakClient().login({ redirectUri: getAppRedirectUri() })
+  await getKeycloakClient().login({ redirectUri: getDashboardRedirectUri() })
 }
 
 export const registerWithKeycloak = async () => {
-  await getKeycloakClient().register({ redirectUri: getAppRedirectUri() })
+  await getKeycloakClient().register({ redirectUri: getDashboardRedirectUri() })
 }
 
 export const logoutFromKeycloak = async () => {
@@ -45,8 +71,9 @@ export const useAuthBootstrap = () => {
 
       const isAuthenticated = await keycloak.init({
         checkLoginIframe: false,
+        onLoad: 'check-sso',
         pkceMethod: 'S256',
-        redirectUri: getAppRedirectUri(),
+        redirectUri: getDashboardRedirectUri(),
       })
 
       if (!isAuthenticated) {
@@ -71,7 +98,16 @@ export const useAuthBootstrap = () => {
         }
       }
 
-      return fetchUserProfile()
+      const fallbackUser = buildFallbackUser()
+
+      try {
+        const profile = await fetchUserProfile()
+        queryClient.setQueryData(queryKeys.user.profile(), profile)
+        return profile
+      } catch {
+        queryClient.setQueryData(queryKeys.user.profile(), fallbackUser)
+        return fallbackUser
+      }
     },
     retry: false,
   })
