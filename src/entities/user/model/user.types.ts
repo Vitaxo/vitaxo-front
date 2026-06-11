@@ -1,11 +1,9 @@
 export type User = {
   id: string
   email: string
-  name: string
-  createdAt: string
-}
-
-export type AuthResponse = {
-  user: User
-  token: string
+  firstName?: string | null
+  lastName?: string | null
+  fullName?: string | null
+  createdAt?: string
+  [key: string]: unknown
 }

@@ -2,23 +2,20 @@ import { create } from 'zustand'
 import type { User } from './user.types'
 
 type UserStore = {
+  isAuthInitialized: boolean
   user: User | null
   isAuthenticated: boolean
-  setUser: (user: User) => void
-  setToken: (token: string) => void
-  logout: () => void
+  initializeAuth: (payload: { isAuthenticated: boolean; user: User | null }) => void
+  setUser: (user: User | null) => void
+  clearAuth: () => void
 }
 
 export const useUserStore = create<UserStore>((set) => ({
+  isAuthInitialized: false,
   user: null,
-  isAuthenticated: !!localStorage.getItem('auth_token'),
-  setUser: (user) => set({ user, isAuthenticated: true }),
-  setToken: (token) => {
-    localStorage.setItem('auth_token', token)
-    set({ isAuthenticated: true })
-  },
-  logout: () => {
-    localStorage.removeItem('auth_token')
-    set({ user: null, isAuthenticated: false })
-  },
+  isAuthenticated: false,
+  initializeAuth: ({ isAuthenticated, user }) =>
+    set({ isAuthInitialized: true, isAuthenticated, user }),
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  clearAuth: () => set({ isAuthInitialized: true, isAuthenticated: false, user: null }),
 }))
