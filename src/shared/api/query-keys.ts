@@ -3,6 +3,6 @@ export const queryKeys = {
     session: () => ['auth', 'session'] as const,
   },
   user: {
-    me: () => ['user', 'me'] as const,
+    profile: () => ['user', 'profile'] as const,
   },
 } as const

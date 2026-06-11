@@ -1,3 +1,3 @@
+export { fetchUserProfile } from './api/user-api'
 export { useUserStore } from './model/user-store'
-export type { AuthResponse, User } from './model/user.types'
-export { loginUser, registerUser } from './api/user-api'
+export type { User } from './model/user.types'
