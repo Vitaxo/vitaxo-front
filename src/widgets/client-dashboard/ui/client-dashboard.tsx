@@ -9,8 +9,10 @@ import {
   ShieldCheck,
   Stethoscope,
 } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useUserStore } from '@/entities/user'
 import { logoutFromKeycloak } from '@/features/auth'
+import { cn } from '@/shared/lib/utils'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 
@@ -31,6 +33,7 @@ const quickActions = [
     description: 'Retrouver vos attestations et documents.',
     icon: FileText,
     label: 'Mes documents',
+    to: '/documents',
   },
   {
     description: 'Consulter vos garanties santé.',
@@ -149,23 +152,38 @@ export const ClientDashboard = () => {
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            {quickActions.map(({ description, icon: Icon, label }) => (
-              <Card key={label} className="transition-colors hover:bg-muted/30">
-                <CardContent className="flex items-start gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Icon className="size-5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{label}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-                    <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                      Bientôt disponible
-                      <ArrowRight className="size-3" />
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {quickActions.map(({ description, icon: Icon, label, to }) => {
+              const card = (
+                <Card
+                  className={cn(
+                    'h-full transition-colors hover:bg-muted/30',
+                    to && 'cursor-pointer',
+                  )}
+                >
+                  <CardContent className="flex items-start gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="size-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium">{label}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+                      <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                        {to ? 'Accéder' : 'Bientôt disponible'}
+                        <ArrowRight className="size-3" />
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+
+              return to ? (
+                <Link className="block" key={label} to={to}>
+                  {card}
+                </Link>
+              ) : (
+                <div key={label}>{card}</div>
+              )
+            })}
           </div>
         </section>
 
