@@ -10,19 +10,42 @@ import {
   ReceiptText,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { fetchHealthInsuranceCard } from '@/entities/document'
+import { fetchHealthInsuranceCard, fetchInsuranceCertificate } from '@/entities/document'
 import { logoutFromKeycloak } from '@/features/auth'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 
 type CardAction = 'view' | 'download'
 
-const comingSoonDocuments = [
+type DownloadableDocument = {
+  description: string
+  fetch: () => Promise<Blob>
+  fileName: string
+  icon: typeof CreditCard
+  id: string
+  title: string
+}
+
+const downloadableDocuments: DownloadableDocument[] = [
   {
-    description: 'Vos attestations de couverture santé.',
-    icon: FileText,
-    label: 'Attestations',
+    description: 'Présentez-la à votre professionnel de santé pour éviter l’avance de frais.',
+    fetch: fetchHealthInsuranceCard,
+    fileName: 'carte-tiers-payant.pdf',
+    icon: CreditCard,
+    id: 'health-insurance-card',
+    title: 'Carte de tiers payant',
   },
+  {
+    description: 'Justificatif de votre couverture santé à transmettre aux organismes qui la demandent.',
+    fetch: fetchInsuranceCertificate,
+    fileName: 'attestation-mutuelle.pdf',
+    icon: FileText,
+    id: 'insurance-certificate',
+    title: 'Attestation de mutuelle',
+  },
+]
+
+const comingSoonDocuments = [
   {
     description: 'L’historique de vos factures et remboursements.',
     icon: ReceiptText,
@@ -31,15 +54,15 @@ const comingSoonDocuments = [
 ]
 
 export const DocumentsPage = () => {
-  const [pendingAction, setPendingAction] = useState<CardAction | null>(null)
+  const [pendingKey, setPendingKey] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const handleCard = async (mode: CardAction) => {
+  const handleDocument = async (doc: DownloadableDocument, mode: CardAction) => {
     setError(null)
-    setPendingAction(mode)
+    setPendingKey(`${doc.id}:${mode}`)
 
     try {
-      const blob = await fetchHealthInsuranceCard()
+      const blob = await doc.fetch()
       const url = window.URL.createObjectURL(blob)
 
       if (mode === 'view') {
@@ -47,24 +70,23 @@ export const DocumentsPage = () => {
       } else {
         const link = document.createElement('a')
         link.href = url
-        link.download = 'carte-tiers-payant.pdf'
+        link.download = doc.fileName
         document.body.appendChild(link)
         link.click()
         link.remove()
       }
 
-      // Keep the object URL alive long enough for the opened tab to load it.
       window.setTimeout(() => window.URL.revokeObjectURL(url), 10_000)
     } catch {
       setError(
-        'Impossible de générer la carte pour le moment. Votre profil doit être actif (onboarding complété).',
+        'Impossible de générer ce document pour le moment. Votre profil doit être actif (onboarding complété).',
       )
     } finally {
-      setPendingAction(null)
+      setPendingKey(null)
     }
   }
 
-  const isBusy = pendingAction !== null
+  const isBusy = pendingKey !== null
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -110,37 +132,43 @@ export const DocumentsPage = () => {
           </div>
         ) : null}
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <div className="flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <CreditCard className="size-5" />
-                </div>
-                <div>
-                  <CardTitle>Carte de tiers payant</CardTitle>
-                  <CardDescription>
-                    Présentez-la à votre professionnel de santé pour éviter l’avance de frais.
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
-              <Button disabled={isBusy} onClick={() => void handleCard('view')}>
-                <Eye />
-                {pendingAction === 'view' ? 'Ouverture…' : 'Voir la carte'}
-              </Button>
-              <Button
-                disabled={isBusy}
-                onClick={() => void handleCard('download')}
-                variant="outline"
-              >
-                <Download />
-                {pendingAction === 'download' ? 'Téléchargement…' : 'Télécharger le PDF'}
-              </Button>
-            </CardContent>
-          </Card>
+        <section className="grid gap-4 md:grid-cols-2">
+          {downloadableDocuments.map((doc) => {
+            const Icon = doc.icon
 
+            return (
+              <Card key={doc.id}>
+                <CardHeader>
+                  <div className="flex items-start gap-3">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="size-5" />
+                    </div>
+                    <div>
+                      <CardTitle>{doc.title}</CardTitle>
+                      <CardDescription>{doc.description}</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-3">
+                  <Button disabled={isBusy} onClick={() => void handleDocument(doc, 'view')}>
+                    <Eye />
+                    {pendingKey === `${doc.id}:view` ? 'Ouverture…' : 'Voir'}
+                  </Button>
+                  <Button
+                    disabled={isBusy}
+                    onClick={() => void handleDocument(doc, 'download')}
+                    variant="outline"
+                  >
+                    <Download />
+                    {pendingKey === `${doc.id}:download` ? 'Téléchargement…' : 'Télécharger le PDF'}
+                  </Button>
+                </CardContent>
+              </Card>
+            )
+          })}
+        </section>
+
+        <section className="grid gap-4 md:grid-cols-3">
           {comingSoonDocuments.map(({ description, icon: Icon, label }) => (
             <Card key={label}>
               <CardContent className="flex items-start gap-3">

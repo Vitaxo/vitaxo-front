@@ -1,1 +1,1 @@
-export { fetchHealthInsuranceCard } from './api/document-api'
+export { fetchHealthInsuranceCard, fetchInsuranceCertificate } from './api/document-api'
