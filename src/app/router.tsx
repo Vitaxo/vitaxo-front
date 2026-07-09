@@ -3,6 +3,7 @@ import { GuestOnlyRoute, ProtectedRoute } from './auth-guard'
 import { DashboardPage } from '@/pages/dashboard'
 import { DocumentsPage } from '@/pages/documents'
 import { LoginPage } from '@/pages/login'
+import { ProfilePage } from '@/pages/profile'
 import { RegisterPage } from '@/pages/register'
 
 export const router = createBrowserRouter([
@@ -35,6 +36,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <DocumentsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/profile',
+    element: (
+      <ProtectedRoute>
+        <ProfilePage />
       </ProtectedRoute>
     ),
   },

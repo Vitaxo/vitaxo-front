@@ -7,3 +7,16 @@ export type User = {
   createdAt?: string
   [key: string]: unknown
 }
+
+export type UpdateUserProfilePayload = {
+  firstName?: string
+  lastName?: string
+  phone?: string
+  streetNumber?: string
+  streetName?: string
+  complement?: string
+  zipCode?: string
+  city?: string
+  country?: string
+  iban?: string
+}

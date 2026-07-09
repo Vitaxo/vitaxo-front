@@ -1,3 +1,3 @@
-export { fetchUserProfile } from './api/user-api'
+export { fetchUserProfile, updateUserProfile } from './api/user-api'
 export { useUserStore } from './model/user-store'
-export type { User } from './model/user.types'
+export type { UpdateUserProfilePayload, User } from './model/user.types'

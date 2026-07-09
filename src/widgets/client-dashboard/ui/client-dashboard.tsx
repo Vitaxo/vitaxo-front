@@ -36,6 +36,12 @@ const quickActions = [
     to: '/documents',
   },
   {
+    description: 'Consulter vos informations personnelles.',
+    icon: ShieldCheck,
+    label: 'Mon profil',
+    to: '/profile',
+  },
+  {
     description: 'Consulter vos garanties santé.',
     icon: Stethoscope,
     label: 'Voir mes garanties',
