@@ -2,9 +2,11 @@ import { createBrowserRouter } from 'react-router-dom'
 import { GuestOnlyRoute, ProtectedRoute } from './auth-guard'
 import { DashboardPage } from '@/pages/dashboard'
 import { DocumentsPage } from '@/pages/documents'
+import { GuaranteesPage } from '@/pages/guarantees'
 import { LoginPage } from '@/pages/login'
 import { ProfilePage } from '@/pages/profile'
 import { RegisterPage } from '@/pages/register'
+import { RefundsPage } from '@/pages/refunds'
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +46,22 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <ProfilePage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/refunds',
+    element: (
+      <ProtectedRoute>
+        <RefundsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/guarantees',
+    element: (
+      <ProtectedRoute>
+        <GuaranteesPage />
       </ProtectedRoute>
     ),
   },
